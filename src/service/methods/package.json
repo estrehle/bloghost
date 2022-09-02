@@ -1,0 +1,12 @@
+{
+  "name": "bloghost-service-handlers",
+  "version": "0.0.1",
+  "description": "Bloghost service handlers",
+  "devDependencies": {
+    "@types/uuid": "^8.3.4"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1208.0",
+    "uuid": "^8.3.2"
+  }
+}
