@@ -6,7 +6,7 @@ const db = new AWS.DynamoDB.DocumentClient();
 const env = environment();
 
 export async function handler(): Promise<APIGatewayProxyResult> {
-  var result: AWS.DynamoDB.DocumentClient.ItemList;
+  let result: AWS.DynamoDB.DocumentClient.ItemList;
   try {
     result = await listArticles();
   } catch (e: any) {

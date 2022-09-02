@@ -1,6 +1,7 @@
-import { App, Stack, StackProps } from 'aws-cdk-lib';
+import { App, Stack } from 'aws-cdk-lib';
 import { Resource, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { HttpMethod } from 'aws-cdk-lib/aws-lambda';
+import { BlogStackProps } from '../shared/stack-props';
 import { ApiGatewayResources } from '../misc/types';
 import { BlogTables } from '../storage/storage.stack';
 import { BlogApiEnv } from './methods/common/environment';
@@ -15,7 +16,7 @@ export interface BlogApiMethodProps {
   tables: BlogTables;
 }
 
-interface ServiceStackProps extends StackProps {
+interface ServiceStackProps extends BlogStackProps {
   tables: BlogTables;
 }
 
