@@ -1,12 +1,13 @@
-import * as AWS from 'aws-sdk';
+import { DynamoDBClient, ScanCommand } from '@aws-sdk/client-dynamodb';
+import { unmarshall } from '@aws-sdk/util-dynamodb';
 import { APIGatewayProxyResult } from 'aws-lambda';
 import { environment } from './common/environment';
 
-const db = new AWS.DynamoDB.DocumentClient();
+const dbClient = new DynamoDBClient({});
 const env = environment();
 
 export async function handler(): Promise<APIGatewayProxyResult> {
-  let result: AWS.DynamoDB.DocumentClient.ItemList;
+  let result: Record<string, any>;
   try {
     result = await listArticles();
   } catch (e: any) {
@@ -16,9 +17,9 @@ export async function handler(): Promise<APIGatewayProxyResult> {
   return { statusCode: 200, body: JSON.stringify({ result }) };
 }
 
-export async function listArticles(): Promise<AWS.DynamoDB.DocumentClient.ItemList> {
-  const result = await db
-    .scan({ TableName: env.ARTICLES_TABLE_NAME })
-    .promise();
-  return result.Items ?? [];
+export async function listArticles(): Promise<Record<string, any>> {
+  const command = new ScanCommand({ TableName: env.ARTICLES_TABLE_NAME });
+  const res = await dbClient.send(command);
+  const result = res.Items?.map((item) => unmarshall(item)) ?? [];
+  return result;
 }

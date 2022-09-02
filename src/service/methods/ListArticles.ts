@@ -13,6 +13,7 @@ export class ListArticlesMethod extends Construct {
       entry: join(__dirname, 'ListArticles.handler.ts'),
       environment: props.env,
       ...commonLambdaProps,
+      layers: [props.layers['aws-sdk-v3']],
     });
 
     props.tables.articles.grantReadData(fn);

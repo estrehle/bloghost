@@ -1,18 +1,28 @@
 import { App, Stack } from 'aws-cdk-lib';
 import { Resource, RestApi } from 'aws-cdk-lib/aws-apigateway';
-import { HttpMethod } from 'aws-cdk-lib/aws-lambda';
+import {
+  Code,
+  HttpMethod,
+  LayerVersion,
+  Runtime,
+} from 'aws-cdk-lib/aws-lambda';
 import { BlogStackProps } from '../shared/stack-props';
-import { ApiGatewayResources } from '../misc/types';
+import { ApiGatewayResources, LambdaLayers } from '../misc/types';
 import { BlogTables } from '../storage/storage.stack';
 import { BlogApiEnv } from './methods/common/environment';
 import { CreateArticleMethod } from './methods/CreateArticle';
 import { ListArticlesMethod } from './methods/ListArticles';
+import { join } from 'path';
+
+const LAYER_NAMES = ['aws-sdk-v3'] as const;
+type BlogApiLayers = LambdaLayers<typeof LAYER_NAMES>;
 
 export interface BlogApiMethodProps {
   httpMethod: HttpMethod;
   resource: Resource;
   api: RestApi;
   env: BlogApiEnv;
+  layers: BlogApiLayers;
   tables: BlogTables;
 }
 
@@ -22,6 +32,7 @@ interface ServiceStackProps extends BlogStackProps {
 
 export class ServiceStack extends Stack {
   private readonly resourceNames = ['articles'] as const;
+  private readonly layerNames = ['aws-sdk-v3'] as const;
 
   private readonly props: ServiceStackProps;
 
@@ -33,7 +44,8 @@ export class ServiceStack extends Stack {
 
     const resources = this.addResources(api);
 
-    this.addMethods(api, resources);
+    const layers = this.addLayers();
+    this.addMethods(api, resources, layers);
   }
 
   private createApi(): RestApi {
@@ -54,11 +66,22 @@ export class ServiceStack extends Stack {
     };
   }
 
+  private addLayers(): BlogApiLayers {
+    return {
+      'aws-sdk-v3': new LayerVersion(this, 'AwsSdkV3', {
+        compatibleRuntimes: [Runtime.NODEJS_16_X],
+        code: Code.fromAsset(join(__dirname, 'layers', 'aws-sdk-v3')),
+        description: 'AWS SDK v3 modules',
+      }),
+    };
+  }
+
   private addMethods(
     api: RestApi,
     resources: ApiGatewayResources<typeof this.resourceNames>,
+    layers: BlogApiLayers,
   ): void {
-    const commonMethodProps = this.getCommonMethodProps(api);
+    const commonMethodProps = this.getCommonMethodProps(api, layers);
 
     new CreateArticleMethod(this, 'CreateArticle', {
       httpMethod: HttpMethod.POST,
@@ -75,6 +98,7 @@ export class ServiceStack extends Stack {
 
   private getCommonMethodProps(
     api: RestApi,
+    layers: BlogApiLayers,
   ): Omit<BlogApiMethodProps, 'httpMethod' | 'resource'> {
     const tables = this.props.tables;
     const env: BlogApiEnv = {
@@ -85,6 +109,7 @@ export class ServiceStack extends Stack {
     return {
       api,
       env,
+      layers,
       tables,
     };
   }

@@ -1,9 +1,10 @@
+import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
 import { APIGatewayProxyResult } from 'aws-lambda';
-import * as AWS from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
 import { environment } from './common/environment';
 
-const db = new AWS.DynamoDB.DocumentClient();
+const dbClient = new DynamoDBClient({});
 const env = environment();
 
 export async function handler(event: {
@@ -23,10 +24,9 @@ export async function handler(event: {
 export async function createArticle(item: any): Promise<void> {
   item[env.ARTICLES_PRIMARY_KEY] = uuidv4();
 
-  await db
-    .put({
-      TableName: env.ARTICLES_TABLE_NAME,
-      Item: item,
-    })
-    .promise();
+  const command = new PutItemCommand({
+    TableName: env.ARTICLES_TABLE_NAME,
+    Item: marshall(item),
+  });
+  await dbClient.send(command);
 }

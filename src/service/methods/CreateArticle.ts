@@ -13,6 +13,7 @@ export class CreateArticleMethod extends Construct {
       entry: join(__dirname, 'CreateArticle.handler.ts'),
       environment: props.env,
       ...commonLambdaProps,
+      layers: [props.layers['aws-sdk-v3']],
     });
 
     props.tables.articles.grantWriteData(fn);
