@@ -1,0 +1,8 @@
+{
+  "name": "bloghost",
+  "version": "0.0.1",
+  "description": "Serverless blog hosting service",
+  "main": "src/main.ts",
+  "scripts": {},
+  "license": "UNLICENSED"
+}
