@@ -7,7 +7,6 @@
     "build": "tsc",
     "cdk": "cdk",
     "lint": "eslint . --ext .ts --fix",
-    "postinstall": "(cd src/service/methods && npm install)",
     "watch": "tsc -w"
   },
   "license": "UNLICENSED",

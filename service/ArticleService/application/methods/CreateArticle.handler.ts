@@ -17,11 +17,10 @@ export async function handler(event: {
   } catch (e: any) {
     return { statusCode: 500, body: 'Internal Server Error' };
   }
-
   return { statusCode: 201, body: '' };
 }
 
-export async function createArticle(item: any): Promise<void> {
+async function createArticle(item: any): Promise<void> {
   item[env.ARTICLES_PRIMARY_KEY] = uuidv4();
 
   const command = new PutItemCommand({

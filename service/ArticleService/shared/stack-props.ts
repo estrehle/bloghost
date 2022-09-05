@@ -1,5 +1,5 @@
 import { StackProps } from 'aws-cdk-lib';
 
-export interface BlogStackProps extends StackProps {
+export interface ArticleSvcStackProps extends StackProps {
   isProduction: boolean;
 }

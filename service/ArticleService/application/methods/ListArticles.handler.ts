@@ -13,7 +13,6 @@ export async function handler(): Promise<APIGatewayProxyResult> {
   } catch (e: any) {
     return { statusCode: 500, body: 'Internal Server Error' };
   }
-
   return { statusCode: 200, body: JSON.stringify({ result }) };
 }
 

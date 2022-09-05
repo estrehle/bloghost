@@ -6,37 +6,37 @@ import {
   LayerVersion,
   Runtime,
 } from 'aws-cdk-lib/aws-lambda';
-import { BlogStackProps } from '../shared/stack-props';
-import { ApiGatewayResources, LambdaLayers } from '../misc/types';
-import { BlogTables } from '../storage/storage.stack';
-import { BlogApiEnv } from './methods/common/environment';
+import { ArticleSvcEnvVars } from './methods/common/environment';
 import { CreateArticleMethod } from './methods/CreateArticle';
 import { ListArticlesMethod } from './methods/ListArticles';
 import { join } from 'path';
+import { ArticleSvcStackProps } from '../shared/stack-props';
+import { ApiGatewayResources, LambdaLayers } from '../../../util/aws-cdk.types';
+import { ArticleSvcTables } from '../storage/storage.stack';
 
 const LAYER_NAMES = ['aws-sdk-v3'] as const;
-type BlogApiLayers = LambdaLayers<typeof LAYER_NAMES>;
+type ArticleSvcLayers = LambdaLayers<typeof LAYER_NAMES>;
 
-export interface BlogApiMethodProps {
+export interface ArticleSvcMethodProps {
   httpMethod: HttpMethod;
   resource: Resource;
   api: RestApi;
-  env: BlogApiEnv;
-  layers: BlogApiLayers;
-  tables: BlogTables;
+  env: ArticleSvcEnvVars;
+  layers: ArticleSvcLayers;
+  tables: ArticleSvcTables;
 }
 
-interface ServiceStackProps extends BlogStackProps {
-  tables: BlogTables;
+interface ArticleSvcApplicationStackProps extends ArticleSvcStackProps {
+  tables: ArticleSvcTables;
 }
 
-export class ServiceStack extends Stack {
+export class ArticleSvcApplicationStack extends Stack {
   private readonly resourceNames = ['articles'] as const;
   private readonly layerNames = ['aws-sdk-v3'] as const;
 
-  private readonly props: ServiceStackProps;
+  private readonly props: ArticleSvcApplicationStackProps;
 
-  constructor(app: App, id: string, props: ServiceStackProps) {
+  constructor(app: App, id: string, props: ArticleSvcApplicationStackProps) {
     super(app, id, props);
     this.props = props;
 
@@ -50,7 +50,7 @@ export class ServiceStack extends Stack {
 
   private createApi(): RestApi {
     const api = new RestApi(this, 'RestApi', {
-      restApiName: 'Blog-Api',
+      restApiName: 'ArticleSvc-Api',
     });
 
     return api;
@@ -66,7 +66,7 @@ export class ServiceStack extends Stack {
     };
   }
 
-  private addLayers(): BlogApiLayers {
+  private addLayers(): ArticleSvcLayers {
     return {
       'aws-sdk-v3': new LayerVersion(this, 'AwsSdkV3', {
         compatibleRuntimes: [Runtime.NODEJS_16_X],
@@ -79,7 +79,7 @@ export class ServiceStack extends Stack {
   private addMethods(
     api: RestApi,
     resources: ApiGatewayResources<typeof this.resourceNames>,
-    layers: BlogApiLayers,
+    layers: ArticleSvcLayers,
   ): void {
     const commonMethodProps = this.getCommonMethodProps(api, layers);
 
@@ -98,10 +98,10 @@ export class ServiceStack extends Stack {
 
   private getCommonMethodProps(
     api: RestApi,
-    layers: BlogApiLayers,
-  ): Omit<BlogApiMethodProps, 'httpMethod' | 'resource'> {
+    layers: ArticleSvcLayers,
+  ): Omit<ArticleSvcMethodProps, 'httpMethod' | 'resource'> {
     const tables = this.props.tables;
-    const env: BlogApiEnv = {
+    const env: ArticleSvcEnvVars = {
       ARTICLES_PRIMARY_KEY: tables.articles.schema().partitionKey.name,
       ARTICLES_TABLE_NAME: tables.articles.tableName,
     };

@@ -1,7 +1,7 @@
 {
-  "name": "bloghost-service-handlers",
+  "name": "article-svc-handlers",
   "version": "0.0.1",
-  "description": "Bloghost service handlers",
+  "description": "ArticleSvc handlers",
   "devDependencies": {
     "@types/uuid": "^8.3.4"
   },
