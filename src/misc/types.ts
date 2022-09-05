@@ -7,4 +7,4 @@ export type ApiGatewayResources<ResourceNames extends readonly string[]> = {
 
 export type LambdaLayers<LayerNames extends readonly string[]> = {
   [key in LayerNames[number]]: LayerVersion;
-}
+};
