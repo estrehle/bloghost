@@ -7,7 +7,8 @@
     "build": "tsc",
     "cdk": "cdk",
     "lint": "eslint . --ext .ts --fix",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "postinstall": "scripts/postinstall.sh"
   },
   "license": "UNLICENSED",
   "dependencies": {
